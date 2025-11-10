@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "module": "esnext",
+    "moduleResolution": "node",
+    "jsx": "react-jsx",
+    "outDir": "./dist",
+    "target": "es6",
+    "baseUrl": ".",
+    "lib": ["dom", "es2020", "webworker"]
+  },
+  "include": ["src/**/*.ts", "src/**/*.tsx", "src/**/*.png"]
+}

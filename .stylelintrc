@@ -1,0 +1,5 @@
+{
+  "customSyntax": "postcss-scss",
+  "defaultSeverity": "warning",
+  "extends": "stylelint-config-recommended"
+}
