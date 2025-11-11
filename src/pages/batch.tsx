@@ -18,6 +18,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import useWorker from '../hooks/useWorker';
 import { BatchFormSchema } from '../types/index';
 import useLoadingProgress from '../hooks/useLoadingProgress';
+import DataPrivacyAlert from '../components/DataPrivacyAlert';
 import { bufferToImageString, getPageTitle } from '../utils/index';
 
 const webGpuAvailable = 'gpu' in navigator;
@@ -107,6 +108,11 @@ export function Component() {
     <Fragment>
       <title>{getPageTitle('Image Batch')}</title>
       <Container fluid>
+        <Row>
+          <Col xs={12}>
+            <DataPrivacyAlert />
+          </Col>
+        </Row>
         <Row className="g-0">
           {webGpuAvailable ? (
             <Fragment>

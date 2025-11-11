@@ -3567,6 +3567,7 @@ __metadata:
     ts-node: "npm:^10.9.2"
     typescript: "npm:^5.9.3"
     typescript-eslint: "npm:^8.46.3"
+    use-local-storage-state: "npm:^19.5.0"
     webpack: "npm:^5.102.1"
     webpack-cli: "npm:^6.0.1"
     webpack-dev-server: "npm:^5.2.2"
@@ -9723,6 +9724,16 @@ __metadata:
   dependencies:
     punycode: "npm:^2.1.0"
   checksum: 10c0/4ef57b45aa820d7ac6496e9208559986c665e49447cb072744c13b66925a362d96dd5a46c4530a6b8e203e5db5fe849369444440cb22ecfc26c679359e5dfa3c
+  languageName: node
+  linkType: hard
+
+"use-local-storage-state@npm:^19.5.0":
+  version: 19.5.0
+  resolution: "use-local-storage-state@npm:19.5.0"
+  peerDependencies:
+    react: ">=18"
+    react-dom: ">=18"
+  checksum: 10c0/0e3651fbd7892573cb26f7335071acca1de04448db8559ccfe8595dc530a65a938ca128abbd50a85fb13b33b0c3f0f84ff7b9b3418766fec413576b92c43c3a6
   languageName: node
   linkType: hard
 
