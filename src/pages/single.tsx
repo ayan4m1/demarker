@@ -7,6 +7,7 @@ import {
   Col,
   Container,
   Form,
+  InputGroup,
   ProgressBar,
   Row
 } from 'react-bootstrap';
@@ -144,15 +145,18 @@ export function Component() {
                     </Form.Group>
                     <Form.Group className="my-2">
                       <Form.Label>Detection Threshold</Form.Label>
-                      <Form.Control
-                        max={100}
-                        min={0}
-                        name="threshold"
-                        onChange={handleChange}
-                        step={1}
-                        type="number"
-                        value={values.threshold}
-                      />
+                      <InputGroup>
+                        <Form.Control
+                          max={100}
+                          min={0}
+                          name="threshold"
+                          onChange={handleChange}
+                          step={1}
+                          type="number"
+                          value={values.threshold}
+                        />
+                        <InputGroup.Text>%</InputGroup.Text>
+                      </InputGroup>
                     </Form.Group>
                     <Form.Group className="text-end">
                       <Button type="submit" variant="success">

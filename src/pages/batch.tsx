@@ -7,6 +7,8 @@ import {
   Col,
   Container,
   Form,
+  InputGroup,
+  ListGroup,
   ProgressBar,
   Row
 } from 'react-bootstrap';
@@ -147,24 +149,31 @@ export function Component() {
                     </Form.Group>
                     <Form.Group className="my-2">
                       <Form.Label>Detection Threshold</Form.Label>
-                      <Form.Control
-                        max={100}
-                        min={0}
-                        name="threshold"
-                        onChange={handleChange}
-                        step={1}
-                        type="number"
-                        value={values.threshold}
-                      />
+                      <InputGroup>
+                        <Form.Control
+                          max={100}
+                          min={0}
+                          name="threshold"
+                          onChange={handleChange}
+                          step={1}
+                          type="number"
+                          value={values.threshold}
+                        />
+                        <InputGroup.Text>%</InputGroup.Text>
+                      </InputGroup>
                     </Form.Group>
-                    <Form.Group className="my-2">
-                      <Form.Label>Images</Form.Label>
-                      <div style={{ maxHeight: 200, overflowY: 'scroll' }}>
-                        {Object.entries(values.images).map(([key]) => (
-                          <p key={key}>{key}</p>
-                        ))}
-                      </div>
-                    </Form.Group>
+                    {Boolean(Object.entries(values.images).length) && (
+                      <Form.Group className="my-2">
+                        <Form.Label>File List</Form.Label>
+                        <div style={{ maxHeight: 200, overflowY: 'scroll' }}>
+                          <ListGroup>
+                            {Object.entries(values.images).map(([key]) => (
+                              <ListGroup.Item key={key}>{key}</ListGroup.Item>
+                            ))}
+                          </ListGroup>
+                        </div>
+                      </Form.Group>
+                    )}
                     <Form.Group className="text-end">
                       <Button
                         disabled={!Object.entries(values.images).length}
