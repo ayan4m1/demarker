@@ -1,18 +1,13 @@
-import {
-  full,
-  RawImage,
-  AutoModel,
-  AutoProcessor
-} from '@huggingface/transformers';
+import { RawImage, AutoModel, AutoProcessor } from '@huggingface/transformers';
 
-async function hasFp16() {
-  try {
-    const adapter = await navigator.gpu.requestAdapter();
-    return adapter.features.has('shader-f16');
-  } catch {
-    return false;
-  }
-}
+// async function hasFp16() {
+//   try {
+//     const adapter = await navigator.gpu.requestAdapter();
+//     return adapter.features.has('shader-f16');
+//   } catch {
+//     return false;
+//   }
+// }
 
 class WatermarkSingleton {
   static model;

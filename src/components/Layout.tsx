@@ -1,7 +1,7 @@
 import { Fragment } from 'react';
 import { Link, Outlet } from 'react-router-dom';
 import { Container, Nav, Navbar } from 'react-bootstrap';
-import { faImages } from '@fortawesome/free-solid-svg-icons';
+import { faImage, faImages } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 export default function Layout() {
@@ -14,7 +14,10 @@ export default function Layout() {
           <Navbar.Collapse>
             <Nav>
               <Nav.Link as={Link} to="/">
-                <FontAwesomeIcon icon={faImages} /> Remove Watermarks
+                <FontAwesomeIcon icon={faImage} /> Single
+              </Nav.Link>
+              <Nav.Link as={Link} to="/batch">
+                <FontAwesomeIcon icon={faImages} /> Batch
               </Nav.Link>
             </Nav>
           </Navbar.Collapse>

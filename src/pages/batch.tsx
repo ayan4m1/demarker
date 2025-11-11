@@ -1,5 +1,5 @@
 import { useFormik } from 'formik';
-import { ChangeEvent, Fragment, useCallback, useRef, useState } from 'react';
+import { Fragment, useCallback, useRef, useState } from 'react';
 import {
   Alert,
   Button,
@@ -14,14 +14,14 @@ import { faSpinner } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 import useWorker from '../hooks/useWorker';
-import { SingleFormSchema } from '../types/index';
+import { BatchFormSchema } from '../types/index';
 import useLoadingProgress from '../hooks/useLoadingProgress';
 import { bufferToImageString, getPageTitle } from '../utils/index';
 
 const webGpuAvailable = 'gpu' in navigator;
 
 export function Component() {
-  const imageRef = useRef(null);
+  const imageRef = useRef<HTMLInputElement>(null);
 
   const [time, setTime] = useState(0);
   const [result, setResult] = useState(null);
@@ -32,6 +32,7 @@ export function Component() {
   const handleWorkerMessage = useCallback(
     (e: MessageEvent) => {
       switch (e.data.status) {
+        // Set the loading message and initiate loading
         case 'loading':
           setStatus('loading');
           setLoadingMessage(e.data.data);
@@ -59,65 +60,62 @@ export function Component() {
   );
   const worker = useWorker(handleWorkerMessage);
   const { values, handleSubmit, handleChange, setFieldValue } =
-    useFormik<SingleFormSchema>({
+    useFormik<BatchFormSchema>({
       initialValues: {
-        image: '',
+        images: {},
         threshold: 50
       },
-      onSubmit: ({ image, threshold }) => {
+      onSubmit: ({ images, threshold }) => {
         setStatus('running');
         worker.current.postMessage({
           type: 'run',
           data: {
-            images: { 'file.png': image },
+            images,
             threshold: threshold / 100
           }
         });
       }
     });
-  const handleFileChange = useCallback(
-    async (e: ChangeEvent<HTMLInputElement>) => {
-      if (!e.currentTarget.files.length) {
-        return;
-      }
+  const handleFileChange = useCallback(async () => {
+    if (!imageRef.current.files.length) {
+      return;
+    }
 
-      // worker.current.postMessage({ type: 'reset' });
+    // worker.current.postMessage({ type: 'reset' });
 
-      const file = e.currentTarget.files.item(0);
+    for (let i = 0; i < imageRef.current.files.length; i++) {
+      const file = imageRef.current.files.item(i);
+      const filename = file.name;
       const mimeType = file.type;
       const fileBytes = await file.bytes();
 
-      setFieldValue('image', bufferToImageString(fileBytes, mimeType));
-    },
-    [setFieldValue]
-  );
+      await setFieldValue('images', (prev: Record<string, string>) => ({
+        ...prev,
+        [filename]: bufferToImageString(fileBytes, mimeType)
+      }));
+    }
+  }, [setFieldValue]);
 
   return (
     <Fragment>
-      <title>{getPageTitle('Single Image')}</title>
+      <title>{getPageTitle('Image Batch')}</title>
       <Container fluid>
         <Row className="g-0">
           {webGpuAvailable ? (
             <Fragment>
               <Col sm={4} xs={12}>
                 <Card body className="me-2">
-                  <Card.Title>Image</Card.Title>
+                  <Card.Title>Images</Card.Title>
                   <Form onSubmit={handleSubmit}>
                     <Form.Group className="text-center">
                       <input
-                        name="image"
+                        multiple
+                        name="images"
                         onChange={handleFileChange}
                         ref={imageRef}
                         style={{ display: 'none' }}
                         type="file"
                       />
-                      {values.image && (
-                        <img
-                          alt="Uploaded Image Preview"
-                          src={values.image}
-                          style={{ height: 200, objectFit: 'contain' }}
-                        />
-                      )}
                       <div
                         className="d-flex justify-content-center align-items-center"
                         style={{
@@ -184,6 +182,9 @@ export function Component() {
                       <p>Result present: {JSON.stringify(result)}</p>
                     </Fragment>
                   )}
+                  {Object.entries(values.images).map(([key]) => (
+                    <p key={key}>{key}</p>
+                  ))}
                 </Card>
               </Col>
             </Fragment>

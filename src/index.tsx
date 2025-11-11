@@ -16,7 +16,11 @@ const router = createHashRouter([
     children: [
       {
         index: true,
-        lazy: () => import(`./pages/single`)
+        lazy: () => import('./pages/single')
+      },
+      {
+        path: '/batch',
+        lazy: () => import('./pages/batch')
       }
     ]
   }
