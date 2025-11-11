@@ -101,9 +101,10 @@ export function Component() {
             <Fragment>
               <Col sm={4} xs={12}>
                 <Card body className="me-2">
-                  <Card.Title>Image</Card.Title>
+                  <Card.Title>Inputs</Card.Title>
                   <Form onSubmit={handleSubmit}>
-                    <Form.Group className="text-center">
+                    <Form.Group className="my-2">
+                      <Form.Label>Image</Form.Label>
                       <input
                         name="image"
                         onChange={handleFileChange}
@@ -141,7 +142,7 @@ export function Component() {
                         </Button>
                       </div>
                     </Form.Group>
-                    <Form.Group>
+                    <Form.Group className="my-2">
                       <Form.Label>Detection Threshold</Form.Label>
                       <Form.Control
                         max={100}
@@ -152,6 +153,11 @@ export function Component() {
                         type="number"
                         value={values.threshold}
                       />
+                    </Form.Group>
+                    <Form.Group className="text-end">
+                      <Button type="submit" variant="success">
+                        Submit
+                      </Button>
                     </Form.Group>
                   </Form>
                 </Card>

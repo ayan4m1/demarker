@@ -24,8 +24,8 @@ export function Component() {
   const imageRef = useRef<HTMLInputElement>(null);
 
   const [time, setTime] = useState(0);
-  const [result, setResult] = useState(null);
   const [status, setStatus] = useState(null);
+  const [results, setResults] = useState<Record<string, boolean>>({});
   const [loadingMessage, setLoadingMessage] = useState('');
   const { progressItems, addItem, updateItem, removeItem } =
     useLoadingProgress();
@@ -49,8 +49,13 @@ export function Component() {
         case 'ready':
           setStatus('ready');
           break;
+        case 'detection':
+          setResults((prev) => ({
+            ...prev,
+            [e.data.image]: e.data.watermarked
+          }));
+          break;
         case 'complete':
-          setResult(e.data.result);
           setTime(e.data.time);
           setStatus('ready');
           break;
@@ -105,9 +110,9 @@ export function Component() {
             <Fragment>
               <Col sm={4} xs={12}>
                 <Card body className="me-2">
-                  <Card.Title>Images</Card.Title>
+                  <Card.Title>Inputs</Card.Title>
                   <Form onSubmit={handleSubmit}>
-                    <Form.Group className="text-center">
+                    <Form.Group className="my-2">
                       <input
                         multiple
                         name="images"
@@ -116,6 +121,7 @@ export function Component() {
                         style={{ display: 'none' }}
                         type="file"
                       />
+                      <Form.Label>Image(s)</Form.Label>
                       <div
                         className="d-flex justify-content-center align-items-center"
                         style={{
@@ -127,7 +133,7 @@ export function Component() {
                           flexGrow: 1
                         }}
                       >
-                        Drop image or{' '}
+                        Drop image(s) or{' '}
                         <Button
                           className="ms-2"
                           onClick={() => {
@@ -139,7 +145,7 @@ export function Component() {
                         </Button>
                       </div>
                     </Form.Group>
-                    <Form.Group>
+                    <Form.Group className="my-2">
                       <Form.Label>Detection Threshold</Form.Label>
                       <Form.Control
                         max={100}
@@ -150,6 +156,23 @@ export function Component() {
                         type="number"
                         value={values.threshold}
                       />
+                    </Form.Group>
+                    <Form.Group className="my-2">
+                      <Form.Label>Images</Form.Label>
+                      <div style={{ maxHeight: 200, overflowY: 'scroll' }}>
+                        {Object.entries(values.images).map(([key]) => (
+                          <p key={key}>{key}</p>
+                        ))}
+                      </div>
+                    </Form.Group>
+                    <Form.Group className="text-end">
+                      <Button
+                        disabled={!Object.entries(values.images).length}
+                        type="submit"
+                        variant="success"
+                      >
+                        Submit
+                      </Button>
                     </Form.Group>
                   </Form>
                 </Card>
@@ -179,12 +202,9 @@ export function Component() {
                   {status === 'ready' && (
                     <Fragment>
                       <p>Execution time: {time.toFixed(2)}</p>
-                      <p>Result present: {JSON.stringify(result)}</p>
+                      <p>Results: {JSON.stringify(results)}</p>
                     </Fragment>
                   )}
-                  {Object.entries(values.images).map(([key]) => (
-                    <p key={key}>{key}</p>
-                  ))}
                 </Card>
               </Col>
             </Fragment>
