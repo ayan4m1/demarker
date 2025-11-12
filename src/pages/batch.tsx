@@ -19,9 +19,11 @@ import useWorker from '../hooks/useWorker';
 import { BatchFormSchema } from '../types/index';
 import useLoadingProgress from '../hooks/useLoadingProgress';
 import DataPrivacyAlert from '../components/DataPrivacyAlert';
-import { bufferToImageString, getPageTitle } from '../utils/index';
-
-const webGpuAvailable = 'gpu' in navigator;
+import {
+  bufferToImageString,
+  getPageTitle,
+  webGpuAvailable
+} from '../utils/index';
 
 export function Component() {
   const imageRef = useRef<HTMLInputElement>(null);
@@ -60,7 +62,7 @@ export function Component() {
           break;
         case 'complete':
           setTime(e.data.time);
-          setStatus('ready');
+          setStatus('results');
           break;
       }
     },
@@ -74,7 +76,8 @@ export function Component() {
         threshold: 50
       },
       onSubmit: ({ images, threshold }) => {
-        setStatus('running');
+        setStatus('loading');
+        setLoadingMessage('Running detection...');
         worker.current.postMessage({
           type: 'run',
           data: {
@@ -88,8 +91,6 @@ export function Component() {
     if (!imageRef.current.files.length) {
       return;
     }
-
-    // worker.current.postMessage({ type: 'reset' });
 
     for (let i = 0; i < imageRef.current.files.length; i++) {
       const file = imageRef.current.files.item(i);
@@ -214,9 +215,9 @@ export function Component() {
                       ))}
                     </div>
                   )}
-                  {status === 'ready' && (
+                  {status === 'results' && (
                     <Fragment>
-                      <p>Execution time: {time.toFixed(2)}</p>
+                      <p>Execution time: {time.toFixed(2)}ms</p>
                       <p>Results: {JSON.stringify(results)}</p>
                     </Fragment>
                   )}

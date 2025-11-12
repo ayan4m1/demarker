@@ -1,3 +1,5 @@
+export const webGpuAvailable = 'gpu' in navigator;
+
 export const getPageTitle = (title: string): string => `Demarker - ${title}`;
 
 export const bufferToImageString = (

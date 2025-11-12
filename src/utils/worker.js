@@ -43,7 +43,7 @@ async function load() {
   self.postMessage({ status: 'ready' });
 }
 
-async function run({ images }) {
+async function run({ images, threshold }) {
   const start = performance.now();
   const [model, processor] = await WatermarkSingleton.getInstance();
 
@@ -53,7 +53,6 @@ async function run({ images }) {
     const { output0 } = await model({ images: pixel_values });
 
     const permuted = output0[0].transpose(1, 0);
-    const threshold = 0.5;
     let watermarked = false;
     for (const row of permuted.tolist()) {
       const score = row[4];
@@ -89,7 +88,6 @@ self.addEventListener('message', async (e) => {
     case 'load':
       load(data);
       break;
-
     case 'run':
       run(data);
       break;

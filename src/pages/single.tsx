@@ -1,5 +1,12 @@
 import { useFormik } from 'formik';
-import { ChangeEvent, Fragment, useCallback, useRef, useState } from 'react';
+import {
+  ChangeEvent,
+  Fragment,
+  useCallback,
+  useEffect,
+  useRef,
+  useState
+} from 'react';
 import {
   Alert,
   Button,
@@ -18,9 +25,11 @@ import useWorker from '../hooks/useWorker';
 import { SingleFormSchema } from '../types/index';
 import useLoadingProgress from '../hooks/useLoadingProgress';
 import DataPrivacyAlert from '../components/DataPrivacyAlert';
-import { bufferToImageString, getPageTitle } from '../utils/index';
-
-const webGpuAvailable = 'gpu' in navigator;
+import {
+  bufferToImageString,
+  getPageTitle,
+  webGpuAvailable
+} from '../utils/index';
 
 export function Component() {
   const imageRef = useRef(null);
@@ -28,32 +37,38 @@ export function Component() {
   const [time, setTime] = useState(0);
   const [result, setResult] = useState(null);
   const [status, setStatus] = useState(null);
-  const [loadingMessage, setLoadingMessage] = useState('');
+  const [loadingMessage, setLoadingMessage] = useState('loading');
   const { progressItems, addItem, updateItem, removeItem } =
     useLoadingProgress();
   const handleWorkerMessage = useCallback(
     (e: MessageEvent) => {
       switch (e.data.status) {
         case 'loading':
+          console.log('loading model');
           setStatus('loading');
           setLoadingMessage(e.data.data);
           break;
         case 'initiate':
+          console.log('add item');
           addItem(e.data);
           break;
         case 'progress':
+          console.log('update item');
           updateItem(e.data);
           break;
         case 'done':
+          console.log('remove item');
           removeItem(e.data);
           break;
         case 'ready':
           setStatus('ready');
           break;
+        case 'detection':
+          setResult(e.data.watermarked);
+          break;
         case 'complete':
-          setResult(e.data.result);
           setTime(e.data.time);
-          setStatus('ready');
+          setStatus('results');
           break;
       }
     },
@@ -67,7 +82,8 @@ export function Component() {
         threshold: 50
       },
       onSubmit: ({ image, threshold }) => {
-        setStatus('running');
+        setStatus('loading');
+        setLoadingMessage('Running detection...');
         worker.current.postMessage({
           type: 'run',
           data: {
@@ -83,8 +99,6 @@ export function Component() {
         return;
       }
 
-      // worker.current.postMessage({ type: 'reset' });
-
       const file = e.currentTarget.files.item(0);
       const mimeType = file.type;
       const fileBytes = await file.bytes();
@@ -93,6 +107,16 @@ export function Component() {
     },
     [setFieldValue]
   );
+
+  useEffect(() => {
+    if (!worker.current) {
+      return;
+    }
+
+    worker.current.postMessage({
+      type: 'load'
+    });
+  }, [worker]);
 
   return (
     <Fragment>
@@ -123,7 +147,12 @@ export function Component() {
                         <img
                           alt="Uploaded Image Preview"
                           src={values.image}
-                          style={{ height: 200, objectFit: 'contain' }}
+                          style={{
+                            height: 200,
+                            objectFit: 'contain',
+                            display: 'block',
+                            margin: '0 auto'
+                          }}
                         />
                       )}
                       <div
@@ -194,10 +223,10 @@ export function Component() {
                       ))}
                     </div>
                   )}
-                  {status === 'ready' && (
+                  {status === 'results' && (
                     <Fragment>
-                      <p>Execution time: {time.toFixed(2)}</p>
-                      <p>Result present: {JSON.stringify(result)}</p>
+                      <p>Execution time: {time.toFixed(2)}ms</p>
+                      <p>Image is {result ? '' : 'not'} watermarked!</p>
                     </Fragment>
                   )}
                 </Card>
