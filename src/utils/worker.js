@@ -14,10 +14,6 @@ class WatermarkSingleton {
   static processor;
 
   static async getInstance(progress_callback = null) {
-    if (this.model && this.processor) {
-      return Promise.resolve([this.model, this.processor]);
-    }
-
     const model = 'ayan4m1/Watermark-Detection-YOLO11-ONNX';
     const dtype = (await hasFp16()) ? 'fp16' : 'fp32';
 
