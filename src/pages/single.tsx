@@ -49,15 +49,12 @@ export function Component() {
           setLoadingMessage(e.data.data);
           break;
         case 'initiate':
-          console.log('add item');
           addItem(e.data);
           break;
         case 'progress':
-          console.log('update item');
           updateItem(e.data);
           break;
         case 'done':
-          console.log('remove item');
           removeItem(e.data);
           break;
         case 'ready':
