@@ -111,7 +111,10 @@ const config: Configuration = {
   plugins,
   resolve: {
     extensions: ['.js', '.ts', '.tsx', '.json'],
-    modules: ['node_modules', 'src']
+    modules: ['node_modules', 'src'],
+    fallback: {
+      path: 'path-browserify'
+    }
   },
   optimization: {
     minimizer: [new TerserPlugin(), new CssMinimizerPlugin()]

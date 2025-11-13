@@ -27,3 +27,5 @@ export const imageStringToBuffer = (imageString: string) => {
 
   return result;
 };
+
+export const allowedImageTypes = ['.png', '.jpg', '.jpeg', '.bmp', '.webp'];

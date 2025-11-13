@@ -25,12 +25,14 @@ import { BatchFormSchema } from '../types/index';
 import useLoadingProgress from '../hooks/useLoadingProgress';
 import DataPrivacyAlert from '../components/DataPrivacyAlert';
 import {
+  allowedImageTypes,
   bufferToImageString,
   getPageTitle,
   imageStringToBuffer,
   webGpuAvailable
 } from '../utils/index';
 import { downloadZip } from 'client-zip';
+import { extname } from 'path';
 
 export function Component() {
   const imageRef = useRef<HTMLInputElement>(null);
@@ -106,6 +108,10 @@ export function Component() {
       const filename = file.name;
       const mimeType = file.type;
       const fileBytes = await file.bytes();
+
+      if (!allowedImageTypes.includes(extname(filename))) {
+        continue;
+      }
 
       await setFieldValue('images', (prev: Record<string, string>) => ({
         ...prev,

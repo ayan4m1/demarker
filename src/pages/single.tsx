@@ -26,10 +26,12 @@ import { SingleFormSchema } from '../types/index';
 import useLoadingProgress from '../hooks/useLoadingProgress';
 import DataPrivacyAlert from '../components/DataPrivacyAlert';
 import {
+  allowedImageTypes,
   bufferToImageString,
   getPageTitle,
   webGpuAvailable
 } from '../utils/index';
+import { extname } from 'path';
 
 export function Component() {
   const imageRef = useRef(null);
@@ -99,6 +101,10 @@ export function Component() {
       const file = e.currentTarget.files.item(0);
       const mimeType = file.type;
       const fileBytes = await file.bytes();
+
+      if (!allowedImageTypes.includes(extname(file.name))) {
+        return;
+      }
 
       setFieldValue('image', bufferToImageString(fileBytes, mimeType));
     },
