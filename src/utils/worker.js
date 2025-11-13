@@ -1,22 +1,25 @@
 import { RawImage, AutoModel, AutoProcessor } from '@huggingface/transformers';
 
-// async function hasFp16() {
-//   try {
-//     const adapter = await navigator.gpu.requestAdapter();
-//     return adapter.features.has('shader-f16');
-//   } catch {
-//     return false;
-//   }
-// }
+async function hasFp16() {
+  try {
+    const adapter = await navigator.gpu.requestAdapter();
+    return adapter.features.has('shader-f16');
+  } catch {
+    return false;
+  }
+}
 
 class WatermarkSingleton {
   static model;
   static processor;
 
   static async getInstance(progress_callback = null) {
+    if (this.model && this.processor) {
+      return Promise.resolve([this.model, this.processor]);
+    }
+
     const model = 'ayan4m1/Watermark-Detection-YOLO11-ONNX';
-    // const dtype = (await hasFp16()) ? 'fp16' : 'fp32';
-    const dtype = 'fp32';
+    const dtype = (await hasFp16()) ? 'fp16' : 'fp32';
 
     this.processor = AutoProcessor.from_pretrained(model);
     this.model = AutoModel.from_pretrained(model, {
