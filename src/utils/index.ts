@@ -16,3 +16,14 @@ export const bufferToImageString = (
 
   return `data:${mimeType};base64,${btoa(binary)}`;
 };
+
+export const imageStringToBuffer = (imageString: string) => {
+  const bytes = atob(imageString.substring(imageString.lastIndexOf(',') + 1));
+  const result = new Uint8Array(bytes.length);
+
+  for (let i = 0; i < bytes.length; i++) {
+    result[i] = bytes.charCodeAt(i);
+  }
+
+  return result;
+};

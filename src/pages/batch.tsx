@@ -12,7 +12,12 @@ import {
   ProgressBar,
   Row
 } from 'react-bootstrap';
-import { faSpinner } from '@fortawesome/free-solid-svg-icons';
+import {
+  faCheck,
+  faDownload,
+  faSpinner,
+  faX
+} from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 import useWorker from '../hooks/useWorker';
@@ -22,8 +27,10 @@ import DataPrivacyAlert from '../components/DataPrivacyAlert';
 import {
   bufferToImageString,
   getPageTitle,
+  imageStringToBuffer,
   webGpuAvailable
 } from '../utils/index';
+import { downloadZip } from 'client-zip';
 
 export function Component() {
   const imageRef = useRef<HTMLInputElement>(null);
@@ -31,6 +38,7 @@ export function Component() {
   const [time, setTime] = useState(0);
   const [status, setStatus] = useState(null);
   const [results, setResults] = useState<Record<string, boolean>>({});
+  const [completedItems, setCompletedItems] = useState(0);
   const [loadingMessage, setLoadingMessage] = useState('');
   const { progressItems, addItem, updateItem, removeItem } =
     useLoadingProgress();
@@ -55,6 +63,7 @@ export function Component() {
           setStatus('ready');
           break;
         case 'detection':
+          setCompletedItems((prev) => prev + 1);
           setResults((prev) => ({
             ...prev,
             [e.data.image]: e.data.watermarked
@@ -76,8 +85,8 @@ export function Component() {
         threshold: 50
       },
       onSubmit: ({ images, threshold }) => {
-        setStatus('loading');
-        setLoadingMessage('Running detection...');
+        setStatus('running');
+        setCompletedItems(0);
         worker.current.postMessage({
           type: 'run',
           data: {
@@ -104,6 +113,27 @@ export function Component() {
       }));
     }
   }, [setFieldValue]);
+  const handleDownloadClick = useCallback(async () => {
+    const blob = await downloadZip(
+      Object.entries(values.images)
+        .filter(([filename]) =>
+          Object.entries(results).some(
+            ([resultFile, watermarked]) =>
+              filename === resultFile && !watermarked
+          )
+        )
+        .map(([filename, data]) => ({
+          name: filename,
+          input: imageStringToBuffer(data)
+        }))
+    ).blob();
+    const link = document.createElement('a');
+
+    link.href = URL.createObjectURL(blob);
+    link.download = 'test.zip';
+    link.click();
+    link.remove();
+  }, [values, results]);
 
   return (
     <Fragment>
@@ -204,21 +234,60 @@ export function Component() {
                         size="3x"
                         spin
                       />
-                      <p>{loadingMessage}</p>
-                      {progressItems.map(({ file, loaded, total }) => (
-                        <ProgressBar
-                          key={file}
-                          label={file}
-                          max={total}
-                          now={loaded}
-                        />
-                      ))}
+                      {status === 'loading' ? (
+                        <Fragment>
+                          <p>{loadingMessage}</p>
+                          {progressItems.map(({ file, loaded, total }) => (
+                            <ProgressBar
+                              key={file}
+                              label={file}
+                              max={total}
+                              min={0}
+                              now={loaded}
+                            />
+                          ))}
+                        </Fragment>
+                      ) : (
+                        <Fragment>
+                          <p>Running detection...</p>
+                          <ProgressBar
+                            animated
+                            label={`${Math.round(
+                              (completedItems /
+                                Object.entries(values.images).length) *
+                                1e2
+                            )}%`}
+                            max={Object.entries(values.images).length}
+                            min={0}
+                            now={completedItems}
+                            striped
+                          />
+                        </Fragment>
+                      )}
                     </div>
                   )}
                   {status === 'results' && (
                     <Fragment>
                       <p>Execution time: {time.toFixed(2)}ms</p>
-                      <p>Results: {JSON.stringify(results)}</p>
+                      <ListGroup>
+                        {Object.entries(values.images).map(([filename]) => (
+                          <ListGroup.Item key={filename}>
+                            <FontAwesomeIcon
+                              color={results[filename] ? 'red' : 'green'}
+                              icon={results[filename] ? faX : faCheck}
+                            />{' '}
+                            {filename} is watermarked
+                          </ListGroup.Item>
+                        ))}
+                      </ListGroup>
+                      <Button
+                        className="my-2"
+                        onClick={handleDownloadClick}
+                        variant="primary"
+                      >
+                        <FontAwesomeIcon icon={faDownload} /> Download
+                        unwatermarked images
+                      </Button>
                     </Fragment>
                   )}
                 </Card>

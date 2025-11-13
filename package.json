@@ -17,6 +17,7 @@
     "@huggingface/transformers": "^3.7.6",
     "bootstrap": "^5.3.8",
     "bootswatch": "^5.3.8",
+    "client-zip": "^2.5.0",
     "formik": "^2.4.8",
     "lodash": "^4.17.21",
     "react": "^19.2.0",

@@ -2926,6 +2926,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"client-zip@npm:^2.5.0":
+  version: 2.5.0
+  resolution: "client-zip@npm:2.5.0"
+  checksum: 10c0/bce56d3c5d0994df203fe20904a1dfcfadbffb5402b663a102c941163fdf01c96cac17096093764af0e3e8099da7145a09b884fc0173556af7559cde6e258657
+  languageName: node
+  linkType: hard
+
 "clone-deep@npm:^4.0.1":
   version: 4.0.1
   resolution: "clone-deep@npm:4.0.1"
@@ -3525,6 +3532,7 @@ __metadata:
     bootstrap: "npm:^5.3.8"
     bootswatch: "npm:^5.3.8"
     clean-webpack-plugin: "npm:^4.0.0"
+    client-zip: "npm:^2.5.0"
     cname-webpack-plugin: "npm:^3.0.0"
     cross-env: "npm:^10.1.0"
     css-loader: "npm:^7.1.2"
