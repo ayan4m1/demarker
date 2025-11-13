@@ -286,7 +286,8 @@ export function Component() {
                               color={results[filename] ? 'red' : 'green'}
                               icon={results[filename] ? faX : faCheck}
                             />{' '}
-                            {filename} is watermarked
+                            {filename} is {results[filename] ? '' : 'not'}{' '}
+                            watermarked
                           </ListGroup.Item>
                         ))}
                       </ListGroup>
