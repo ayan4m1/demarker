@@ -1,5 +1,5 @@
 import { useFormik } from 'formik';
-import { Fragment, useCallback, useRef, useState } from 'react';
+import { Fragment, useCallback, useEffect, useRef, useState } from 'react';
 import {
   Alert,
   Button,
@@ -134,6 +134,16 @@ export function Component() {
     link.click();
     link.remove();
   }, [values, results]);
+
+  useEffect(() => {
+    if (!worker.current) {
+      return;
+    }
+
+    worker.current.postMessage({
+      type: 'load'
+    });
+  }, [worker]);
 
   return (
     <Fragment>
