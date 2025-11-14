@@ -1,7 +1,8 @@
+import { extname } from 'path';
 import { useFormik } from 'formik';
+import { downloadZip } from 'client-zip';
 import { Fragment, useCallback, useEffect, useRef, useState } from 'react';
 import {
-  Alert,
   Button,
   Card,
   Col,
@@ -20,74 +21,43 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
-import useWorker from '../hooks/useWorker';
-import { BatchFormSchema } from '../types/index';
+import { FormSchema } from '../types/index';
+import WebGPUWrapper from '../components/WebGPUWrapper';
+import useDetectionWorker from '../hooks/useDetectionWorker';
 import useLoadingProgress from '../hooks/useLoadingProgress';
 import DataPrivacyAlert from '../components/DataPrivacyAlert';
 import {
   allowedImageTypes,
   bufferToImageString,
+  DetectionStatus,
   getPageTitle,
-  imageStringToBuffer,
-  webGpuAvailable
+  imageStringToBuffer
 } from '../utils/index';
-import { downloadZip } from 'client-zip';
-import { extname } from 'path';
 
 export function Component() {
-  const imageRef = useRef<HTMLInputElement>(null);
-
   const [time, setTime] = useState(0);
   const [status, setStatus] = useState(null);
+  const imageRef = useRef<HTMLInputElement>(null);
   const [results, setResults] = useState<Record<string, boolean>>({});
   const [completedItems, setCompletedItems] = useState(0);
   const [loadingMessage, setLoadingMessage] = useState('');
-  const { progressItems, addItem, updateItem, removeItem } =
-    useLoadingProgress();
-  const handleWorkerMessage = useCallback(
-    (e: MessageEvent) => {
-      switch (e.data.status) {
-        // Set the loading message and initiate loading
-        case 'loading':
-          setStatus('loading');
-          setLoadingMessage(e.data.data);
-          break;
-        case 'initiate':
-          addItem(e.data);
-          break;
-        case 'progress':
-          updateItem(e.data);
-          break;
-        case 'done':
-          removeItem(e.data);
-          break;
-        case 'ready':
-          setStatus('ready');
-          break;
-        case 'detection':
-          setCompletedItems((prev) => prev + 1);
-          setResults((prev) => ({
-            ...prev,
-            [e.data.image]: e.data.watermarked
-          }));
-          break;
-        case 'complete':
-          setTime(e.data.time);
-          setStatus('results');
-          break;
-      }
-    },
-    [addItem, updateItem, removeItem]
-  );
-  const worker = useWorker(handleWorkerMessage);
+  const loadingProgress = useLoadingProgress();
+  const { progressItems } = loadingProgress;
+  const worker = useDetectionWorker(loadingProgress, {
+    setCompletedItems,
+    setLoadingMessage,
+    setResults,
+    setStatus,
+    setTime
+  });
   const { values, handleSubmit, handleChange, setFieldValue } =
-    useFormik<BatchFormSchema>({
+    useFormik<FormSchema>({
       initialValues: {
         images: {},
         threshold: 50
       },
       onSubmit: ({ images, threshold }) => {
-        setStatus('running');
+        setStatus(DetectionStatus.Running);
         setCompletedItems(0);
         worker.current.postMessage({
           type: 'run',
@@ -153,7 +123,7 @@ export function Component() {
 
   return (
     <Fragment>
-      <title>{getPageTitle('Image Batch')}</title>
+      <title>{getPageTitle('Dewatermark Batch')}</title>
       <Container fluid>
         <Row>
           <Col xs={12}>
@@ -161,7 +131,7 @@ export function Component() {
           </Col>
         </Row>
         <Row className="g-0">
-          {webGpuAvailable ? (
+          <WebGPUWrapper>
             <Fragment>
               <Col sm={4} xs={12}>
                 <Card body className="me-2">
@@ -176,7 +146,7 @@ export function Component() {
                         style={{ display: 'none' }}
                         type="file"
                       />
-                      <Form.Label>Image(s)</Form.Label>
+                      <Form.Label>Images</Form.Label>
                       <div
                         className="d-flex justify-content-center align-items-center"
                         style={{
@@ -188,7 +158,7 @@ export function Component() {
                           flexGrow: 1
                         }}
                       >
-                        Drop image(s) or{' '}
+                        Drop images or{' '}
                         <Button
                           className="ms-2"
                           onClick={() => {
@@ -242,7 +212,9 @@ export function Component() {
               <Col sm={8} xs={12}>
                 <Card body>
                   <Card.Title>Results</Card.Title>
-                  {['loading', 'running'].includes(status) && (
+                  {[DetectionStatus.Loading, DetectionStatus.Running].includes(
+                    status
+                  ) && (
                     <div className="text-center">
                       <FontAwesomeIcon
                         className="mb-2"
@@ -250,7 +222,7 @@ export function Component() {
                         size="3x"
                         spin
                       />
-                      {status === 'loading' ? (
+                      {status === DetectionStatus.Loading ? (
                         <Fragment>
                           <p>{loadingMessage}</p>
                           {progressItems.map(({ file, loaded, total }) => (
@@ -310,12 +282,7 @@ export function Component() {
                 </Card>
               </Col>
             </Fragment>
-          ) : (
-            <Alert variant="danger">
-              Your browser does not support WebGPU. This page will not work
-              correctly.
-            </Alert>
-          )}
+          </WebGPUWrapper>
         </Row>
       </Container>
     </Fragment>

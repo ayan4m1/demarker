@@ -29,3 +29,12 @@ export const imageStringToBuffer = (imageString: string) => {
 };
 
 export const allowedImageTypes = ['.png', '.jpg', '.jpeg', '.bmp', '.webp'];
+
+export enum DetectionStatus {
+  Loading = 'loading',
+  Ready = 'ready',
+  Running = 'running',
+  Results = 'results'
+}
+
+export type DetectionStatusKey = keyof typeof DetectionStatus;

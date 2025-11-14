@@ -1,7 +1,7 @@
 import { Fragment } from 'react';
-import { Link, Outlet } from 'react-router-dom';
-import { Container, Nav, Navbar } from 'react-bootstrap';
-import { faImage, faImages } from '@fortawesome/free-solid-svg-icons';
+import { Outlet } from 'react-router-dom';
+import { Container, Navbar } from 'react-bootstrap';
+import { faImages } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 export default function Layout() {
@@ -9,18 +9,12 @@ export default function Layout() {
     <Fragment>
       <Navbar bg="primary" expand="sm" variant="dark">
         <Container>
-          <Navbar.Brand>Demarker</Navbar.Brand>
-          <Navbar.Toggle />
-          <Navbar.Collapse>
-            <Nav>
-              <Nav.Link as={Link} to="/">
-                <FontAwesomeIcon icon={faImage} /> Single
-              </Nav.Link>
-              <Nav.Link as={Link} to="/batch">
-                <FontAwesomeIcon icon={faImages} /> Batch
-              </Nav.Link>
-            </Nav>
-          </Navbar.Collapse>
+          <Navbar.Brand>
+            <FontAwesomeIcon icon={faImages} size="lg" /> Demarker
+            <span className="ms-4">
+              Filter out watermarked images using your local device and WebGPU
+            </span>
+          </Navbar.Brand>
         </Container>
       </Navbar>
       <Container className="mt-4 h-100">

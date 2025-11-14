@@ -4,8 +4,8 @@ import { RouterProvider, createHashRouter } from 'react-router-dom';
 
 import './index.scss';
 import Layout from './components/Layout';
-import SuspenseFallback from './components/SuspenseFallback';
 import ErrorBoundary from './components/ErrorBoundary';
+import SuspenseFallback from './components/SuspenseFallback';
 
 const root = createRoot(document.getElementById('root'));
 const router = createHashRouter([
@@ -16,10 +16,6 @@ const router = createHashRouter([
     children: [
       {
         index: true,
-        lazy: () => import('./pages/single')
-      },
-      {
-        path: '/batch',
         lazy: () => import('./pages/batch')
       }
     ]
