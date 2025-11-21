@@ -132,156 +132,154 @@ export function Component() {
         </Row>
         <Row className="g-0">
           <WebGPUWrapper>
-            <Fragment>
-              <Col sm={4} xs={12}>
-                <Card body className="me-2">
-                  <Card.Title>Inputs</Card.Title>
-                  <Form onSubmit={handleSubmit}>
-                    <Form.Group className="my-2">
-                      <input
-                        multiple
-                        name="images"
-                        onChange={handleFileChange}
-                        ref={imageRef}
-                        style={{ display: 'none' }}
-                        type="file"
-                      />
-                      <Form.Label>Images</Form.Label>
-                      <div
-                        className="d-flex justify-content-center align-items-center"
-                        style={{
-                          border: '4px dashed #ccc',
-                          borderRadius: 12,
-                          margin: 24,
-                          padding: 20,
-                          minHeight: 200,
-                          flexGrow: 1
+            <Col sm={4} xs={12}>
+              <Card body className="me-2">
+                <Card.Title>Inputs</Card.Title>
+                <Form onSubmit={handleSubmit}>
+                  <Form.Group className="my-2">
+                    <input
+                      multiple
+                      name="images"
+                      onChange={handleFileChange}
+                      ref={imageRef}
+                      style={{ display: 'none' }}
+                      type="file"
+                    />
+                    <Form.Label>Images</Form.Label>
+                    <div
+                      className="d-flex justify-content-center align-items-center"
+                      style={{
+                        border: '4px dashed #ccc',
+                        borderRadius: 12,
+                        margin: 24,
+                        padding: 20,
+                        minHeight: 200,
+                        flexGrow: 1
+                      }}
+                    >
+                      Drop images or{' '}
+                      <Button
+                        className="ms-2"
+                        onClick={() => {
+                          imageRef.current?.click();
                         }}
+                        variant="secondary"
                       >
-                        Drop images or{' '}
-                        <Button
-                          className="ms-2"
-                          onClick={() => {
-                            imageRef.current?.click();
-                          }}
-                          variant="secondary"
-                        >
-                          browse
-                        </Button>
+                        browse
+                      </Button>
+                    </div>
+                  </Form.Group>
+                  <Form.Group className="my-2">
+                    <Form.Label>Detection Threshold</Form.Label>
+                    <InputGroup>
+                      <Form.Control
+                        max={100}
+                        min={0}
+                        name="threshold"
+                        onChange={handleChange}
+                        step={1}
+                        type="number"
+                        value={values.threshold}
+                      />
+                      <InputGroup.Text>%</InputGroup.Text>
+                    </InputGroup>
+                  </Form.Group>
+                  {Boolean(Object.entries(values.images).length) && (
+                    <Form.Group className="my-2">
+                      <Form.Label>File List</Form.Label>
+                      <div style={{ maxHeight: 200, overflowY: 'scroll' }}>
+                        <ListGroup>
+                          {Object.entries(values.images).map(([key]) => (
+                            <ListGroup.Item key={key}>{key}</ListGroup.Item>
+                          ))}
+                        </ListGroup>
                       </div>
                     </Form.Group>
-                    <Form.Group className="my-2">
-                      <Form.Label>Detection Threshold</Form.Label>
-                      <InputGroup>
-                        <Form.Control
-                          max={100}
-                          min={0}
-                          name="threshold"
-                          onChange={handleChange}
-                          step={1}
-                          type="number"
-                          value={values.threshold}
-                        />
-                        <InputGroup.Text>%</InputGroup.Text>
-                      </InputGroup>
-                    </Form.Group>
-                    {Boolean(Object.entries(values.images).length) && (
-                      <Form.Group className="my-2">
-                        <Form.Label>File List</Form.Label>
-                        <div style={{ maxHeight: 200, overflowY: 'scroll' }}>
-                          <ListGroup>
-                            {Object.entries(values.images).map(([key]) => (
-                              <ListGroup.Item key={key}>{key}</ListGroup.Item>
-                            ))}
-                          </ListGroup>
-                        </div>
-                      </Form.Group>
-                    )}
-                    <Form.Group className="text-end">
-                      <Button
-                        disabled={!Object.entries(values.images).length}
-                        type="submit"
-                        variant="success"
-                      >
-                        Submit
-                      </Button>
-                    </Form.Group>
-                  </Form>
-                </Card>
-              </Col>
-              <Col sm={8} xs={12}>
-                <Card body>
-                  <Card.Title>Results</Card.Title>
-                  {[DetectionStatus.Loading, DetectionStatus.Running].includes(
-                    status
-                  ) && (
-                    <div className="text-center">
-                      <FontAwesomeIcon
-                        className="mb-2"
-                        icon={faSpinner}
-                        size="3x"
-                        spin
-                      />
-                      {status === DetectionStatus.Loading ? (
-                        <Fragment>
-                          <p>{loadingMessage}</p>
-                          {progressItems.map(({ file, loaded, total }) => (
-                            <ProgressBar
-                              key={file}
-                              label={file}
-                              max={total}
-                              min={0}
-                              now={loaded}
-                            />
-                          ))}
-                        </Fragment>
-                      ) : (
-                        <Fragment>
-                          <p>Running detection...</p>
+                  )}
+                  <Form.Group className="text-end">
+                    <Button
+                      disabled={!Object.entries(values.images).length}
+                      type="submit"
+                      variant="success"
+                    >
+                      Submit
+                    </Button>
+                  </Form.Group>
+                </Form>
+              </Card>
+            </Col>
+            <Col sm={8} xs={12}>
+              <Card body>
+                <Card.Title>Results</Card.Title>
+                {[DetectionStatus.Loading, DetectionStatus.Running].includes(
+                  status
+                ) && (
+                  <div className="text-center">
+                    <FontAwesomeIcon
+                      className="mb-2"
+                      icon={faSpinner}
+                      size="3x"
+                      spin
+                    />
+                    {status === DetectionStatus.Loading ? (
+                      <Fragment>
+                        <p>{loadingMessage}</p>
+                        {progressItems.map(({ file, loaded, total }) => (
                           <ProgressBar
-                            animated
-                            label={`${Math.round(
-                              (completedItems /
-                                Object.entries(values.images).length) *
-                                1e2
-                            )}%`}
-                            max={Object.entries(values.images).length}
+                            key={file}
+                            label={file}
+                            max={total}
                             min={0}
-                            now={completedItems}
-                            striped
+                            now={loaded}
                           />
-                        </Fragment>
-                      )}
-                    </div>
-                  )}
-                  {status === 'results' && (
-                    <Fragment>
-                      <p>Execution time: {time.toFixed(2)}ms</p>
-                      <ListGroup>
-                        {Object.entries(values.images).map(([filename]) => (
-                          <ListGroup.Item key={filename}>
-                            <FontAwesomeIcon
-                              color={results[filename] ? 'red' : 'green'}
-                              icon={results[filename] ? faX : faCheck}
-                            />{' '}
-                            {filename} is {results[filename] ? '' : 'not'}{' '}
-                            watermarked
-                          </ListGroup.Item>
                         ))}
-                      </ListGroup>
-                      <Button
-                        className="my-2"
-                        onClick={handleDownloadClick}
-                        variant="primary"
-                      >
-                        <FontAwesomeIcon icon={faDownload} /> Download
-                        unwatermarked images
-                      </Button>
-                    </Fragment>
-                  )}
-                </Card>
-              </Col>
-            </Fragment>
+                      </Fragment>
+                    ) : (
+                      <Fragment>
+                        <p>Running detection...</p>
+                        <ProgressBar
+                          animated
+                          label={`${Math.round(
+                            (completedItems /
+                              Object.entries(values.images).length) *
+                              1e2
+                          )}%`}
+                          max={Object.entries(values.images).length}
+                          min={0}
+                          now={completedItems}
+                          striped
+                        />
+                      </Fragment>
+                    )}
+                  </div>
+                )}
+                {status === 'results' && (
+                  <Fragment>
+                    <p>Execution time: {time.toFixed(2)}ms</p>
+                    <ListGroup>
+                      {Object.entries(values.images).map(([filename]) => (
+                        <ListGroup.Item key={filename}>
+                          <FontAwesomeIcon
+                            color={results[filename] ? 'red' : 'green'}
+                            icon={results[filename] ? faX : faCheck}
+                          />{' '}
+                          {filename} is {results[filename] ? '' : 'not'}{' '}
+                          watermarked
+                        </ListGroup.Item>
+                      ))}
+                    </ListGroup>
+                    <Button
+                      className="my-2"
+                      onClick={handleDownloadClick}
+                      variant="primary"
+                    >
+                      <FontAwesomeIcon icon={faDownload} /> Download
+                      unwatermarked images
+                    </Button>
+                  </Fragment>
+                )}
+              </Card>
+            </Col>
           </WebGPUWrapper>
         </Row>
       </Container>
